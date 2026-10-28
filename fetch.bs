@@ -136,7 +136,6 @@ urlPrefix:https://www.rfc-editor.org/rfc/rfc6454;type:dfn;spec:RFC6454
 <pre class=link-defaults>
 spec:dom; type:dfn; text:element
 spec:dom; type:dfn; text:event;
-spec:xhr; type:event; text:progress;
 spec:infra; type:dfn; text:implementation-defined
 spec:infra; type:dfn; text:success
 </pre>
@@ -9675,7 +9674,8 @@ return <a>this</a>'s <a for=FetchMonitor>response total</a>.
 <p>The <dfn attribute for=FetchMonitor><code>onrequestprogress</code></dfn> and
 <dfn attribute for=FetchMonitor><code>onresponseprogress</code></dfn> attributes are
 <a>event handler IDL attributes</a> whose <a>event handler event types</a> are
-<code>requestprogress</code> and <code>responseprogress</code>, respectively.
+<a event for=FetchMonitor><code>requestprogress</code></a> and
+<a event for=FetchMonitor><code>responseprogress</code></a>, respectively.
 
 <div algorithm>
 <p>The
@@ -9787,10 +9787,8 @@ method steps are:
 
    <li><p>If not roughly 50ms has passed since these steps were last invoked, then return.
 
-   <li><p><a>Fire a progress event</a> named
-   <a event><code>requestprogress</code></a> at <var>monitor</var> with
-   <var>monitor</var>'s <a for=FetchMonitor>request loaded</a> and
-   <var>monitor</var>'s <a for=FetchMonitor>request total</a>.
+   <li><p><a>Fire an event</a> named <a event for=FetchMonitor><code>requestprogress</code></a> at
+   <var>monitor</var>.
   </ol>
 
  <li>
@@ -9799,9 +9797,8 @@ method steps are:
   <ol>
    <li><p>If <var>monitor</var> is null, then return.
 
-   <li><p><a>Fire a progress event</a> named <a event><code>requestprogress</code></a> at
-   <var>monitor</var> with <var>monitor</var>'s <a for=FetchMonitor>request loaded</a> and
-   <var>monitor</var>'s <a for=FetchMonitor>request total</a>.
+   <li><p><a>Fire an event</a> named <a event for=FetchMonitor><code>requestprogress</code></a> at
+   <var>monitor</var>.
   </ol>
 
  <li>
@@ -9815,9 +9812,8 @@ method steps are:
 
    <li><p>If not roughly 50ms has passed since these steps were last invoked, then return.
 
-   <li><p><a>Fire a progress event</a> named <code>responseprogress</code> at <var>monitor</var>
-   with <var>monitor</var>'s <a for=FetchMonitor>response loaded</a> and
-   <var>monitor</var>'s <a for=FetchMonitor>response total</a>.
+   <li><p><a>Fire an event</a> named <a event for=FetchMonitor><code>responseprogress</code></a> at
+   <var>monitor</var>.
   </ol>
 
  <li>
@@ -9828,9 +9824,8 @@ method steps are:
    <var>response</var>'s <a for=response>type</a> is "<code>error</code>",
    "<code>opaque</code>", or "<code>opaqueredirect</code>", then return.
 
-   <li><p><a>Fire a progress event</a> named <code>responseprogress</code> at <var>monitor</var>
-   with <var>monitor</var>'s <a for=FetchMonitor>response loaded</a> and
-   <var>monitor</var>'s <a for=FetchMonitor>response total</a>.
+   <li><p><a>Fire an event</a> named <a event for=FetchMonitor><code>responseprogress</code></a> at
+   <var>monitor</var>.
   </ol>
 
  <li>
@@ -9881,7 +9876,7 @@ method steps are:
 
 <p>The <dfn id=event-fetchmonitor-requestprogress event for=FetchMonitor><code>requestprogress</code></dfn>
 and <dfn id=event-fetchmonitor-responseprogress event for=FetchMonitor><code>responseprogress</code></dfn>
-events use the {{ProgressEvent}} interface.
+events use the {{Event}} interface.
 
 <div algorithm>
 <p>To <dfn lt="Abort the fetch() call" export id=abort-fetch>abort a <code>fetch()</code> call</dfn>
@@ -10540,126 +10535,6 @@ if this was not done automatically by passing the <a for=request>initiator type<
 done only by navigations). The <a>fetch controller</a> is also used to
 <a for="fetch controller">process the next manual redirect</a> for <a for=/>requests</a> with
 <a for=request>redirect mode</a> set to "<code>manual</code>".
-
-<h2 id=interface-progressevent>Interface {{ProgressEvent}}</h2>
-
-<pre class=idl>
-[Exposed=(Window,Worker)]
-interface ProgressEvent : Event {
-  constructor(DOMString type, optional ProgressEventInit eventInitDict = {});
-
-  readonly attribute boolean lengthComputable;
-  readonly attribute double loaded;
-  readonly attribute double total;
-};
-
-dictionary ProgressEventInit : EventInit {
-  boolean lengthComputable = false;
-  double loaded = 0;
-  double total = 0;
-};
-</pre>
-
-<p><a>Events</a> using the {{ProgressEvent}} interface indicate some kind of progression.
-
-<p>The
-<dfn attribute for=ProgressEvent><code>lengthComputable</code></dfn>,
-<dfn attribute for=ProgressEvent><code>loaded</code></dfn>, and
-<dfn attribute for=ProgressEvent><code>total</code></dfn>
-getter steps are to return the value they were initialized to.
-
-
-<h3 id=firing-events-using-the-progressevent-interface>Firing events using the {{ProgressEvent}} interface</h3>
-
-<p>To <dfn id=concept-event-fire-progress>fire a progress event</dfn> named <var>e</var> at
-<var>target</var>, given <var>transmitted</var> and <var>length</var>, means to <a>fire an event</a>
-named <var>e</var> at <var>target</var>, using {{ProgressEvent}}, with the {{ProgressEvent/loaded}}
-attribute initialized to <var>transmitted</var>, and if <var>length</var> is not 0, with the
-{{ProgressEvent/lengthComputable}} attribute initialized to true and the {{ProgressEvent/total}}
-attribute initialized to <var>length</var>.
-
-
-<h3 id=suggested-names-for-events-using-the-progressevent-interface>Suggested names for events using the {{ProgressEvent}} interface</h3>
-
-<p><em>This section is non-normative.</em>
-
-<p>The suggested {{Event/type}}
-attribute values for use with
-<a>events</a> using the
-{{ProgressEvent}} interface are summarized in the table below.
-Specification editors are free to tune the details to their specific
-scenarios, though are strongly encouraged to discuss their usage with the
-WHATWG community to ensure input from people familiar with the subject.
-
-<table>
- <tbody>
-  <tr>
-   <th>{{Event/type}} attribute value
-   <th>Description
-   <th>Times
-   <th>When
-  <tr>
-   <th><code>loadstart</code>
-   <td>Progress has begun.
-   <td>Once.
-   <td>First.
-  <tr>
-   <th><a event><code>progress</code></a>
-   <td>In progress.
-   <td>Once or more.
-   <td>After <code>loadstart</code> has been
-    <a>dispatched</a>.
-  <tr>
-   <th><a event><code>requestprogress</code></a>
-   <td>In progress request.
-   <td>Once or more.
-   <td>After <code>loadstart</code> has been
-    <a>dispatched</a>.
-  <tr>
-   <th><code>error</code>
-   <td>Progression failed.
-   <td rowspan=4>Zero or once (mutually exclusive).
-   <td rowspan=4>After the last <a event><code>progress</code></a> has
-    been
-    <a>dispatched</a>.
-  <tr>
-   <th><code>abort</code>
-   <td>Progression is terminated.
-  <tr>
-   <th><code>timeout</code>
-   <td>Progression is terminated due to preset time expiring.
-  <tr>
-   <th><code>load</code>
-   <td>Progression is successful.
-  <tr>
-   <th><code>loadend</code>
-   <td>Progress has stopped.
-   <td>Once.
-   <td>After one of <code>error</code>, <code>abort</code>,
-    <code>timeout</code> or <code>load</code> has been
-    <a>dispatched</a>.
-</table>
-
-<p>The <code>error</code>, <code>abort</code>, <code>timeout</code>, and
-<code>load</code> event types are mutually exclusive.
-
-<p>Throughout the web platform the <code>error</code>, <code>abort</code>,
-<code>timeout</code> and <code>load</code> event types have
-their {{Event/bubbles}} and {{Event/cancelable}}
-attributes initialized to false, so it is suggested that for consistency all
-<a>events</a> using the
-{{ProgressEvent}} interface do the same.
-
-
-<h3 id=security-considerations>Security considerations</h3>
-
-<p>For cross-origin requests some kind of opt-in, e.g., the
-<a>CORS protocol</a>, has to be used before <a>events</a> using the
-{{ProgressEvent}} interface are
-<a>dispatched</a>
-as information (e.g., size) would be revealed that cannot be obtained
-otherwise.
-
 
 <h2 id=acknowledgments class=no-num>Acknowledgments</h2>
 
